@@ -1,5 +1,5 @@
 {
-  "name": "load-lorry",
+  "name": "truckerpath",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,13 +14,13 @@
     "@react-three/fiber": "^9.6.0",
     "@react-three/postprocessing": "^3.0.4",
     "@types/three": "^0.184.0",
-    "framer-motion": "^12.38.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.8.0",
     "postprocessing": "^6.39.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.14.2",
     "three": "^0.184.0"
   },
   "devDependencies": {
