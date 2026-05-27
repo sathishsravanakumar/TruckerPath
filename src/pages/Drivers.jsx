@@ -31,12 +31,13 @@ export default function Drivers() {
   return (
     <div className="animate-fade">
       <div style={{ marginBottom: '24px' }}>
+        <div className="s-tag">Fleet Personnel</div>
         <h2>Driver Roster</h2>
-        <p>Full fleet driver overview with safety scores and HOS status</p>
+        <p style={{ marginTop: '4px' }}>Full fleet driver overview with safety scores and HOS status</p>
       </div>
 
       <div className="stat-row">
-        <div className="stat-card"><h3>Total Drivers</h3><div className="val" style={{color:'var(--blue)'}}>{DRIVERS.length}</div></div>
+        <div className="stat-card"><h3>Total Drivers</h3><div className="val" style={{color:'var(--amber)'}}>{DRIVERS.length}</div></div>
         <div className="stat-card"><h3>Available</h3><div className="val" style={{color:'var(--green)'}}>{availableCount}</div></div>
         <div className="stat-card"><h3>At Risk</h3><div className="val" style={{color:'var(--amber)'}}>{atRiskCount}</div></div>
         <div className="stat-card"><h3>Critical</h3><div className="val" style={{color:'var(--red)'}}>{criticalCount}</div></div>

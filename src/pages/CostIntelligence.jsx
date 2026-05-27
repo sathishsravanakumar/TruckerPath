@@ -46,8 +46,9 @@ export default function CostIntelligence() {
     <div className="animate-fade">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
+          <div className="s-tag">Financial Intelligence</div>
           <h2>Cost Intelligence</h2>
-          <p>Automated 3-way P&L reconciliation with AI narrative</p>
+          <p style={{ marginTop: '4px' }}>Automated 3-way P&L reconciliation with AI narrative</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           {Object.keys(WEEK_DATA).map(range => (
@@ -63,7 +64,7 @@ export default function CostIntelligence() {
       <div className="stat-row">
         <div className="stat-card"><h3>Total Revenue</h3><div className="val" style={{color:'var(--green)'}}>${totalRevenue.toLocaleString()}</div></div>
         <div className="stat-card"><h3>Net Margin</h3><div className="val" style={{color:'var(--green)'}}>${netMargin.toLocaleString()}</div></div>
-        <div className="stat-card"><h3>Margin %</h3><div className="val" style={{color:'var(--blue)'}}>{marginPct}%</div></div>
+        <div className="stat-card"><h3>Margin %</h3><div className="val" style={{color:'var(--amber)'}}>{marginPct}%</div></div>
         <div className="stat-card"><h3>vs Last Week</h3><div className="val" style={{color:'var(--red)'}}>-$2,340</div></div>
       </div>
 
@@ -73,7 +74,7 @@ export default function CostIntelligence() {
           {weekData.map((d, i) => (
             <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end', width: '100%', justifyContent: 'center', height: '150px' }}>
-                <div style={{ width: '35%', height: `${(d.revenue / maxVal) * 140}px`, background: 'var(--blue)', borderRadius: '4px 4px 0 0', transition: 'height 0.5s ease' }} />
+                <div style={{ width: '35%', height: `${(d.revenue / maxVal) * 140}px`, background: 'var(--amber)', borderRadius: '4px 4px 0 0', transition: 'height 0.5s ease' }} />
                 <div style={{ width: '35%', height: `${(d.cost / maxVal) * 140}px`, background: 'rgba(208,221,231,0.3)', borderRadius: '4px 4px 0 0', transition: 'height 0.5s ease' }} />
               </div>
               <span className="small">{d.label}</span>
@@ -81,7 +82,7 @@ export default function CostIntelligence() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: '24px', justifyContent: 'center', marginTop: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '12px', height: '12px', borderRadius: '3px', background: 'var(--blue)' }} /><span className="small">Revenue</span></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '12px', height: '12px', borderRadius: '3px', background: 'var(--amber)' }} /><span className="small">Revenue</span></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '12px', height: '12px', borderRadius: '3px', background: 'rgba(208,221,231,0.3)' }} /><span className="small">Cost</span></div>
         </div>
       </div>
@@ -123,8 +124,8 @@ export default function CostIntelligence() {
 
       <div className="ai-insight" style={{ marginTop: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <TrendingUp size={20} color="var(--blue)" />
-          <h4 style={{ color: 'var(--blue)' }}>AI PROFITABILITY ANALYSIS — Week of April 14–18</h4>
+          <TrendingUp size={20} color="var(--amber)" />
+          <h4 style={{ color: 'var(--amber)' }}>AI PROFITABILITY ANALYSIS — Week of April 14–18</h4>
         </div>
         <p style={{ lineHeight: '1.7', marginBottom: '16px' }}>
           This week: <strong>23 loads completed</strong>. Net margin <strong>${netMargin.toLocaleString()}</strong> — down <strong style={{ color: 'var(--red)' }}>$2,340</strong> from last week.

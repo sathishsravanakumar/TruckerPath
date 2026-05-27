@@ -46,7 +46,7 @@ export default function AlertsFeed() {
                 <Marker position={[32.2226, -110.9747]}><Popup><strong>RELAY POINT: TUCSON</strong><br/>Unit-07 (Frank Chen)</Popup></Marker>
               </MapContainer>
               <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 500, background: 'rgba(0,0,0,0.8)', padding: '12px', borderRadius: '8px', border: '1px solid var(--blue)' }}>
-                <p className="small" style={{ color: 'var(--blue)' }}>● LIVE OSM FEED ACTIVE</p>
+                <p className="small" style={{ color: 'var(--amber)' }}>● LIVE OSM FEED ACTIVE</p>
                 <p className="small" style={{ color: 'var(--muted)' }}>Region: SW - US (AZ/TX)</p>
               </div>
             </div>
@@ -56,7 +56,8 @@ export default function AlertsFeed() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2>Live Alert Feed</h2>
+          <div className="s-tag">Live Monitoring</div>
+          <h2>Alert Feed</h2>
           {alerts.length > 0 && <span className="badge red" style={{ fontSize: '11px', marginTop: '6px', display: 'inline-block' }}>{alerts.length} UNRESOLVED</span>}
         </div>
         {alerts.length > 0 && (

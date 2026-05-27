@@ -341,6 +341,65 @@ export const DRIVER_DOCS = {
   ],
 };
 
+export const USER_SHIPMENTS = [
+  {
+    id: 'SHP-1042', loadId: 303,
+    origin: 'Chicago, IL', dest: 'Dallas, TX', status: 'In Transit', eta: 'Jun 3',
+    driver: 'Raj P.', driverPhone: '(602) 555-0112', commodity: 'Electronics', weight: '18,400 lbs',
+    amount: '$3,240', trailer: 'Dry Van', bol: 'BOL-88421', truck: 'TRUCK-012',
+    pickupDate: 'May 30, 2026', deliveryDate: 'Jun 3, 2026', distance: '921 mi',
+    events: [
+      { label: 'Order Confirmed', time: 'May 29 · 10:14 AM', done: true },
+      { label: 'Picked up in Chicago, IL', time: 'May 30 · 7:42 AM', done: true },
+      { label: 'Departed Chicago Terminal', time: 'May 30 · 9:15 AM', done: true },
+      { label: 'In Transit — Kansas City, MO', time: 'May 31 · 2:30 PM', done: true },
+      { label: 'Estimated Arrival Dallas, TX', time: 'Jun 3 · by 5:00 PM', done: false },
+    ],
+  },
+  {
+    id: 'SHP-1039', loadId: 302,
+    origin: 'Atlanta, GA', dest: 'Miami, FL', status: 'Delivered', eta: 'May 28',
+    driver: 'Lisa R.', driverPhone: '(480) 555-0291', commodity: 'Retail', weight: '12,200 lbs',
+    amount: '$2,100', trailer: 'Dry Van', bol: 'BOL-87903', truck: 'TRUCK-009',
+    pickupDate: 'May 25, 2026', deliveryDate: 'May 28, 2026', distance: '662 mi',
+    events: [
+      { label: 'Order Confirmed', time: 'May 24 · 3:05 PM', done: true },
+      { label: 'Picked up in Atlanta, GA', time: 'May 25 · 8:00 AM', done: true },
+      { label: 'In Transit — Gainesville, FL', time: 'May 26 · 11:45 AM', done: true },
+      { label: 'Arrived Miami, FL', time: 'May 28 · 9:22 AM', done: true },
+      { label: 'Delivered — Signed by R. Lopez', time: 'May 28 · 10:55 AM', done: true },
+    ],
+  },
+  {
+    id: 'SHP-1034', loadId: null,
+    origin: 'Los Angeles, CA', dest: 'Phoenix, AZ', status: 'Delivered', eta: 'May 22',
+    driver: 'Marcus J.', driverPhone: '(480) 555-0338', commodity: 'Automotive', weight: '22,000 lbs',
+    amount: '$1,840', trailer: 'Flatbed', bol: 'BOL-87214', truck: 'TRUCK-015',
+    pickupDate: 'May 20, 2026', deliveryDate: 'May 22, 2026', distance: '372 mi',
+    events: [
+      { label: 'Order Confirmed', time: 'May 19 · 1:00 PM', done: true },
+      { label: 'Picked up in Los Angeles, CA', time: 'May 20 · 6:30 AM', done: true },
+      { label: 'Cleared Inspection — Blythe, CA', time: 'May 21 · 10:10 AM', done: true },
+      { label: 'Delivered — Phoenix, AZ', time: 'May 22 · 2:48 PM', done: true },
+      { label: 'POD Uploaded', time: 'May 22 · 3:15 PM', done: true },
+    ],
+  },
+  {
+    id: 'SHP-1028', loadId: null,
+    origin: 'Seattle, WA', dest: 'Denver, CO', status: 'Delivered', eta: 'May 15',
+    driver: 'Sandra R.', driverPhone: '(206) 555-0462', commodity: 'Industrial', weight: '14,600 lbs',
+    amount: '$2,680', trailer: 'Dry Van', bol: 'BOL-86540', truck: 'TRK-22',
+    pickupDate: 'May 12, 2026', deliveryDate: 'May 15, 2026', distance: '1,321 mi',
+    events: [
+      { label: 'Order Confirmed', time: 'May 11 · 9:00 AM', done: true },
+      { label: 'Picked up in Seattle, WA', time: 'May 12 · 7:15 AM', done: true },
+      { label: 'In Transit — Boise, ID', time: 'May 13 · 12:00 PM', done: true },
+      { label: 'In Transit — Salt Lake City, UT', time: 'May 14 · 8:40 AM', done: true },
+      { label: 'Delivered — Denver, CO', time: 'May 15 · 11:55 AM', done: true },
+    ],
+  },
+];
+
 export const LOAD_QUEUE = [
   { id: '#304', driver: 'Frank Chen', route: 'PHX→DAL', invoiceAmt: '$2,982', marginAmt: '$241', ocrLines: [
     '📄 Scanning Bill of Lading...', '   Load ID: #304', '   Shipper: Phoenix Industrial Supply Co.', '   Consignee: Dallas Freight Terminal', '   Weight: 42,000 lbs', '   Commodity: Industrial Equipment', '',

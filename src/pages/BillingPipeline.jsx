@@ -3,7 +3,7 @@ import { INITIAL_HISTORY, LOAD_QUEUE } from '../data/mockData';
 import { useFleetState } from '../hooks/useFleetState';
 
 export default function BillingPipeline() {
-  const { pushNotification } = useFleetState();
+  const { pushNotification, markInvoiced } = useFleetState();
   const [stage, setStage] = useState('idle');
   const [progress, setProgress] = useState(0);
   const [ocrText, setOcrText] = useState('');
@@ -19,7 +19,7 @@ export default function BillingPipeline() {
     let status, color;
     if (i < currentLoadIdx) { status = 'INVOICED ✓'; color = 'var(--green)'; }
     else if (i === currentLoadIdx && stage !== 'idle') { status = 'PROCESSING'; color = 'var(--amber)'; }
-    else if (i === currentLoadIdx) { status = 'AWAITING DOCS'; color = 'var(--blue)'; }
+    else if (i === currentLoadIdx) { status = 'AWAITING DOCS'; color = 'var(--amber)'; }
     else { status = 'QUEUED'; color = 'var(--muted)'; }
     return { id: lq.id, status, driver: lq.driver, color };
   });
@@ -60,6 +60,10 @@ export default function BillingPipeline() {
       title: `Invoice Sent — Load ${currentLoad.id}`,
       message: `${currentLoad.invoiceAmt} invoice sent to billing for ${currentLoad.route}. Net-30.`,
     });
+    // Mark the corresponding user shipment as invoiced
+    // LOAD_QUEUE IDs like '#304' — map to load ids by stripping '#'
+    const numericId = parseInt(currentLoad.id.replace('#', ''));
+    if (!isNaN(numericId)) markInvoiced(numericId);
   };
 
   const processNext = () => {
@@ -74,8 +78,9 @@ export default function BillingPipeline() {
     <div className="animate-fade">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
         <div>
+          <div className="s-tag">Revenue Operations</div>
           <h2>Billing & Documentation</h2>
-          <p>Document upload → AI extraction → Invoice in seconds</p>
+          <p style={{ marginTop: '4px' }}>Document upload → AI extraction → Invoice in seconds</p>
         </div>
         <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 20px', fontSize: '12px', textAlign: 'right' }}>
           <span style={{ color: 'var(--muted)' }}>{totalInvoiced} loads invoiced · $67,340 revenue · $13,060 margin</span><br/>
@@ -130,7 +135,7 @@ export default function BillingPipeline() {
       {stage === 'scanning' && (
         <div style={{ marginBottom: '24px' }}>
           <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', height: '6px', overflow: 'hidden', marginBottom: '16px' }}>
-            <div style={{ width: `${progress}%`, height: '100%', background: 'var(--blue)', transition: 'width 0.1s linear', borderRadius: '8px' }} />
+            <div style={{ width: `${progress}%`, height: '100%', background: 'var(--amber)', transition: 'width 0.1s linear', borderRadius: '8px' }} />
           </div>
           <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px', fontFamily: "'Courier New', monospace", fontSize: '12px', color: 'var(--green)', lineHeight: '1.8', maxHeight: '300px', overflowY: 'auto', whiteSpace: 'pre-wrap' }}>
             {ocrText}<span style={{ opacity: progress < 100 ? 1 : 0 }}>▌</span>
@@ -179,14 +184,14 @@ export default function BillingPipeline() {
           </thead>
           <tbody>
             {history.map((row, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: row.time === 'Just now' ? 'rgba(57,171,212,0.05)' : 'transparent' }}>
+              <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: row.time === 'Just now' ? 'rgba(245,158,11,0.05)' : 'transparent' }}>
                 <td style={{ padding: '14px 16px', fontWeight: '700' }}>{row.load}</td>
                 <td style={{ padding: '14px 16px' }}>{row.driver}</td>
                 <td style={{ padding: '14px 16px', fontFamily: 'monospace', fontSize: '12px' }}>{row.route}</td>
                 <td style={{ padding: '14px 16px', fontWeight: '600' }}>{row.invoice}</td>
                 <td style={{ padding: '14px 16px', color: 'var(--green)' }}>{row.margin}</td>
-                <td style={{ padding: '14px 16px' }}><span style={{ color: row.status.includes('PAID') ? 'var(--green)' : row.time === 'Just now' ? 'var(--blue)' : 'var(--muted)', fontWeight: '600', fontSize: '12px' }}>{row.status}</span></td>
-                <td style={{ padding: '14px 16px', color: row.time === 'Just now' ? 'var(--blue)' : 'var(--muted)', fontSize: '12px', fontWeight: row.time === 'Just now' ? '700' : '400' }}>{row.time}</td>
+                <td style={{ padding: '14px 16px' }}><span style={{ color: row.status.includes('PAID') ? 'var(--green)' : row.time === 'Just now' ? 'var(--amber)' : 'var(--muted)', fontWeight: '600', fontSize: '12px' }}>{row.status}</span></td>
+                <td style={{ padding: '14px 16px', color: row.time === 'Just now' ? 'var(--amber)' : 'var(--muted)', fontSize: '12px', fontWeight: row.time === 'Just now' ? '700' : '400' }}>{row.time}</td>
               </tr>
             ))}
           </tbody>
