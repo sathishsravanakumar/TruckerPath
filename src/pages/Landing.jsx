@@ -188,6 +188,7 @@ export default function Landing({ onShowView }) {
   const [scrolled, setScrolled] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
+  const [annual, setAnnual] = useState(true);
   const statsRef = useRef(null);
   const revealRefs = useRef([]);
 
@@ -482,57 +483,89 @@ export default function Landing({ onShowView }) {
       {/* PRICING */}
       <section className="lp-section" id="pricing" style={{ background: 'var(--bg3)' }}>
         <div className="lp-s-tag lp-reveal" ref={rv}>Transparent Pricing</div>
-        <h2 className="lp-s-title lp-reveal" ref={rv}>Find the Perfect Solution<br />for Your Business</h2>
-        <p className="lp-s-sub lp-reveal" ref={rv}>Our experts will help you choose the right products and pricing plan tailored to your fleet size. No setup fee. Cancel anytime.</p>
+        <h2 className="lp-s-title lp-reveal" ref={rv}>Simple, Transparent Pricing</h2>
+        <p className="lp-s-sub lp-reveal" ref={rv}>No hidden fees. No long-term contracts. Start free and scale as your fleet grows.</p>
+
+        {/* Billing toggle */}
+        <div className="lp-billing-toggle lp-reveal" ref={rv}>
+          <button className={`lp-billing-btn${!annual ? ' active' : ''}`} onClick={() => setAnnual(false)}>Monthly</button>
+          <button className={`lp-billing-btn${annual ? ' active' : ''}`} onClick={() => setAnnual(true)}>
+            Annual <span className="lp-save-badge">Save 17%</span>
+          </button>
+        </div>
+
         <div className="lp-price-grid">
+
+          {/* Plan 1 — Driver (Free) */}
           <div className="lp-price-card lp-reveal" ref={rv} style={{ transitionDelay: '0s' }}>
-            <div className="lp-plan-name">Trucker Path App</div>
+            <div className="lp-plan-name">Driver App</div>
             <div className="lp-plan-price"><span className="cur">$</span>0</div>
-            <div className="lp-plan-period">For drivers & owner-ops with 1–2 trucks</div>
-            <div className="lp-plan-desc">Mobile solution with everything a driver needs on the road. Download free and get started immediately.</div>
+            <div className="lp-plan-period">Free forever</div>
+            <div className="lp-plan-audience">For individual truckers &amp; owner-ops</div>
+            <div className="lp-plan-desc">GPS navigation, load board access, and 500K+ truck stop POIs — everything you need on the road, at no cost.</div>
             <div className="lp-plan-feats">
-              <div className="lp-pf">Truck GPS & navigation</div>
+              <div className="lp-pf">Truck GPS &amp; navigation</div>
               <div className="lp-pf">500K+ truck stop POIs</div>
               <div className="lp-pf">Real-time parking availability</div>
               <div className="lp-pf">Weigh station status</div>
               <div className="lp-pf">Fuel price comparison</div>
+              <div className="lp-pf">Free load board access</div>
               <div className="lp-pf na">Fleet management dashboard</div>
-              <div className="lp-pf na">White glove setup</div>
+              <div className="lp-pf na">Dispatch &amp; driver tracking</div>
+              <div className="lp-pf na">Billing &amp; invoicing</div>
             </div>
-            <button className="btn-plan-ghost2" onClick={() => onShowView('user-login')}>Download Free →</button>
+            <button className="btn-plan-ghost" onClick={() => onShowView('user-login')}>Get Started Free →</button>
           </div>
+
+          {/* Plan 2 — Fleet Pro (featured) */}
           <div className="lp-price-card featured lp-reveal" ref={rv} style={{ transitionDelay: '0.1s' }}>
-            <div className="lp-plan-name">Fleet Navigation</div>
-            <div className="lp-plan-price" style={{ fontSize: 32, letterSpacing: -1 }}>Custom</div>
-            <div className="lp-plan-period">For fleets with 3+ trucks · Free 30-day trial</div>
-            <div className="lp-plan-desc">Commercial truck-safe navigation with enterprise security, white-glove onboarding, and dedicated support.</div>
+            <div className="lp-plan-name">Fleet Pro</div>
+            <div className="lp-plan-price">
+              <span className="cur">$</span>{annual ? 49 : 59}
+              {!annual && <span className="lp-price-was"> save $120/yr with annual</span>}
+            </div>
+            <div className="lp-plan-period">per truck / month{annual ? ', billed annually' : ', billed monthly'}</div>
+            <div className="lp-plan-audience">For fleets with 3–50 trucks · 30-day free trial</div>
+            <div className="lp-plan-desc">Full fleet OS — dispatch, real-time tracking, AI load optimization, billing pipeline, and white-glove onboarding.</div>
             <div className="lp-plan-feats">
               <div className="lp-pf">Everything in Driver App</div>
-              <div className="lp-pf">Commercial fleet navigation</div>
-              <div className="lp-pf">Custom routes & locations</div>
-              <div className="lp-pf">White glove setup & training</div>
-              <div className="lp-pf">SOC2 · SSO · ISO 27001 · MDM</div>
-              <div className="lp-pf">Dashboards & reports</div>
-              <div className="lp-pf">24/7 dedicated support</div>
+              <div className="lp-pf">Smart dispatch board</div>
+              <div className="lp-pf">Real-time driver &amp; load tracking</div>
+              <div className="lp-pf">Custom routes &amp; geofences</div>
+              <div className="lp-pf">Billing pipeline &amp; invoicing</div>
+              <div className="lp-pf">AI load matching &amp; optimization</div>
+              <div className="lp-pf">Cost intelligence dashboard</div>
+              <div className="lp-pf">Live alerts &amp; HOS monitoring</div>
+              <div className="lp-pf">White glove setup &amp; training</div>
             </div>
             <button className="btn-plan-blue" onClick={() => onShowView('admin-login')}>Start Free Trial →</button>
           </div>
+
+          {/* Plan 3 — Enterprise */}
           <div className="lp-price-card lp-reveal" ref={rv} style={{ transitionDelay: '0.2s' }}>
-            <div className="lp-plan-name">Load Board</div>
-            <div className="lp-plan-price"><span className="cur">$</span>0</div>
-            <div className="lp-plan-period">Free for carriers & owner-ops forever</div>
-            <div className="lp-plan-desc">AI-enhanced free load board. 150,000+ loads daily. Connect with shippers and find freight faster than ever.</div>
+            <div className="lp-plan-name">Enterprise</div>
+            <div className="lp-plan-price lp-plan-price-custom">Custom</div>
+            <div className="lp-plan-period">Volume pricing · Custom contract</div>
+            <div className="lp-plan-audience">For fleets of 50+ trucks</div>
+            <div className="lp-plan-desc">Enterprise-grade security, dedicated account management, custom integrations, and guaranteed SLAs at any scale.</div>
             <div className="lp-plan-feats">
-              <div className="lp-pf">150,000+ daily loads</div>
-              <div className="lp-pf">AI-powered load matching</div>
-              <div className="lp-pf">Free unlimited access</div>
-              <div className="lp-pf">Search online or via app</div>
-              <div className="lp-pf na">Dispatch & navigation</div>
-              <div className="lp-pf na">Fleet dashboard</div>
-              <div className="lp-pf na">White glove support</div>
+              <div className="lp-pf">Everything in Fleet Pro</div>
+              <div className="lp-pf">Dedicated account manager</div>
+              <div className="lp-pf">Custom API integrations</div>
+              <div className="lp-pf">SOC2 · SSO · ISO 27001 · MDM</div>
+              <div className="lp-pf">99.9% uptime SLA</div>
+              <div className="lp-pf">Custom contract &amp; billing</div>
+              <div className="lp-pf">On-site training &amp; deployment</div>
+              <div className="lp-pf">24/7 priority support line</div>
+              <div className="lp-pf">Unlimited trucks</div>
             </div>
-            <button className="btn-plan-ghost2" onClick={() => onShowView('user-login')}>Search Loads Free →</button>
+            <button className="btn-plan-ghost" onClick={() => onShowView('admin-login')}>Contact Sales →</button>
           </div>
+
+        </div>
+
+        <div className="lp-pricing-note">
+          All paid plans include a 30-day free trial · No credit card required · Cancel anytime
         </div>
       </section>
 
