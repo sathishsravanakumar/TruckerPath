@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import LoginChooser from './components/LoginChooser';
 import AdminLogin from './components/AdminLogin';
@@ -18,9 +18,14 @@ import TpLogo from './components/TpLogo';
 
 export default function App() {
   const [view, setView] = useState('landing');
+  const navigate = useNavigate();
   const showView = v => setView(v);
   const handleLogin = role => setView(role === 'admin' ? 'admin-dash' : 'user-dash');
   const handleLogout = () => setView('landing');
+
+  useEffect(() => {
+    if (view === 'admin-dash') navigate('/dispatch', { replace: true });
+  }, [view]);
 
   return (
     <>
