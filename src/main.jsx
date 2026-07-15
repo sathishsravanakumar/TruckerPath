@@ -7,7 +7,7 @@ import { FleetProvider } from './hooks/useFleetState'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <FleetProvider>
         <App />
       </FleetProvider>

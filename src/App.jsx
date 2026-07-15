@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Landing from './pages/Landing';
 import LoginChooser from './components/LoginChooser';
 import AdminLogin from './components/AdminLogin';
@@ -18,15 +18,21 @@ import TpLogo from './components/TpLogo';
 import LoadMarketplace from './pages/LoadMarketplace';
 
 export default function App() {
-  const [view, setView] = useState('landing');
+  const [view, setView] = useState(() => sessionStorage.getItem('tp-view') ?? 'landing');
   const navigate = useNavigate();
+  const location = useLocation();
   const showView = v => setView(v);
   const handleLogin = role => setView(role === 'admin' ? 'admin-dash' : 'user-dash');
-  const handleLogout = () => setView('landing');
+  const handleLogout = () => { setView('landing'); navigate('/', { replace: true }); };
 
   useEffect(() => {
-    if (view === 'admin-dash') navigate('/dispatch', { replace: true });
+    sessionStorage.setItem('tp-view', view);
   }, [view]);
+
+  useEffect(() => {
+    // On login land on /dispatch; on refresh keep the current admin sub-page
+    if (view === 'admin-dash' && location.pathname === '/') navigate('/dispatch', { replace: true });
+  }, [view]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
