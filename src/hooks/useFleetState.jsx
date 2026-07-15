@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import { INITIAL_LOADS, ALERTS, DRIVERS, USER_SHIPMENTS } from '../data/mockData';
+import { INITIAL_LOADS, ALERTS, DRIVERS, USER_SHIPMENTS, TRUCK_GVWR } from '../data/mockData';
 
 const FleetContext = createContext(null);
 
@@ -192,7 +192,27 @@ export function FleetProvider({ children }) {
         title: `Load #${nextId} Created`,
         message: `${load.pickup} → ${load.delivery} · ${load.cargo} · $${load.rate.toLocaleString()}`,
       });
+
+      // Broadcast backhaul opportunity if below 80% GVWR
+      const assignedTruckId = newLoad.truckId || newLoad.driverTruckId;
+      const gvwr = TRUCK_GVWR[assignedTruckId];
+      if (gvwr && load.weight < 0.8 * gvwr) {
+        pushNotification({
+          type: 'info',
+          title: 'Backhaul Opportunity Broadcast',
+          message: `Load #${nextId} · ${load.pickup} → ${load.delivery} — partial capacity, backhaul opportunity broadcast`,
+        });
+      }
+
       return [load, ...prev];
+    });
+  }, [pushNotification]);
+
+  const awardBackhaul = useCallback((opportunityId, bidId, carrierName, netValue, route) => {
+    pushNotification({
+      type: 'success',
+      title: 'Backhaul Awarded',
+      message: `${carrierName} awarded backhaul on ${route} · Net value $${netValue}`,
     });
   }, [pushNotification]);
 
@@ -200,7 +220,7 @@ export function FleetProvider({ children }) {
     <FleetContext.Provider value={{
       loads, alerts, showMap, setShowMap,
       notifications, pushNotification, markAllRead, dismissNotification, clearAllNotifications,
-      handleConfirmLoad, handleDismissAlert, addLoad,
+      handleConfirmLoad, handleDismissAlert, addLoad, awardBackhaul,
       userShipments, bookShipment, markDelivered, markInvoiced,
     }}>
       {children}

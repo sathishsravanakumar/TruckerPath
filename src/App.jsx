@@ -15,6 +15,7 @@ import DriverProfile from './pages/DriverProfile';
 import CostIntelligence from './pages/CostIntelligence';
 import Drivers from './pages/Drivers';
 import TpLogo from './components/TpLogo';
+import LoadMarketplace from './pages/LoadMarketplace';
 
 export default function App() {
   const [view, setView] = useState('landing');
@@ -101,6 +102,7 @@ export default function App() {
               <Route path="/alerts" element={<AlertsFeed />} />
               <Route path="/billing" element={<BillingPipeline />} />
               <Route path="/cost" element={<CostIntelligence />} />
+              <Route path="/marketplace" element={<LoadMarketplace />} />
             </Routes>
           </div>
         </div>

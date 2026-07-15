@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Zap, Plus, ArrowRight } from 'lucide-react';
-import { DRIVERS, INITIAL_LOADS } from '../data/mockData';
+import { DRIVERS, INITIAL_LOADS, TRUCK_GVWR } from '../data/mockData';
 import { useFleetState } from '../hooks/useFleetState';
 import LoadCreationDrawer from '../components/LoadCreationDrawer';
 
@@ -34,6 +34,54 @@ function ReturnBar({ prob }) {
       <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '4px', height: '4px', overflow: 'hidden' }}>
         <div style={{ width: `${prob}%`, height: '100%', background: color, borderRadius: '4px', transition: 'width 0.5s ease' }} />
       </div>
+    </div>
+  );
+}
+
+/** Shows a compact backhaul capacity indicator for assigned loads */
+function BackhaulBadge({ load, driver }) {
+  const truck = driver?.truck;
+  const gvwr = TRUCK_GVWR[truck];
+  if (!gvwr || !load.weight) return null;
+  const utilizationPct = Math.round((load.weight / gvwr) * 100);
+  if (utilizationPct >= 80) return null; // full enough — no backhaul opportunity
+
+  const remainingPct = 100 - utilizationPct;
+  const remainingLbs = gvwr - load.weight;
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      background: 'rgba(245,158,11,0.06)',
+      border: '1px solid rgba(245,158,11,0.2)',
+      borderRadius: '10px',
+      padding: '10px 14px',
+      marginTop: '12px',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Mini capacity bar */}
+        <div style={{ width: 80, height: 6, borderRadius: 100, background: 'rgba(255,255,255,0.08)', overflow: 'hidden', flexShrink: 0 }}>
+          <div style={{ width: `${utilizationPct}%`, height: '100%', background: 'var(--amber)', borderRadius: 100 }} />
+        </div>
+        <div>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--amber)' }}>
+            {utilizationPct}% loaded
+          </span>
+          <span style={{ fontSize: 11, color: 'var(--muted)', marginLeft: 8 }}>
+            {remainingLbs.toLocaleString()} lbs · {remainingPct}% space open
+          </span>
+        </div>
+        <span className="badge amber" style={{ fontSize: 9, letterSpacing: '1px' }}>BACKHAUL ACTIVE</span>
+      </div>
+      <Link
+        to="/marketplace"
+        style={{ textDecoration: 'none' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <button className="btn" style={{ padding: '5px 12px', fontSize: '10px', flexShrink: 0 }}>
+          View Bids →
+        </button>
+      </Link>
     </div>
   );
 }
@@ -248,29 +296,34 @@ export default function DispatchBoard() {
             const driver = DRIVERS.find(d => d.id === load.driverId);
             return (
               <div key={load.id} className="load-card" style={{ borderLeft: `3px solid ${load.status === 'delivered' ? 'var(--muted)' : 'var(--green)'}`, opacity: load.status === 'delivered' ? 0.6 : 1 }}>
-                <div style={{ padding: '14px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                      <span style={{ fontFamily: 'var(--font-display)', fontWeight: '800', fontSize: '15px' }}>Load #{load.id}</span>
-                      <span className={`badge green`}>{load.status === 'delivered' ? 'DELIVERED' : 'IN TRANSIT'}</span>
-                      {load.tag === 'NEW ORDER' && <span className="badge amber">CUSTOMER ORDER</span>}
+                <div style={{ padding: '14px 22px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                        <span style={{ fontFamily: 'var(--font-display)', fontWeight: '800', fontSize: '15px' }}>Load #{load.id}</span>
+                        <span className={`badge green`}>{load.status === 'delivered' ? 'DELIVERED' : 'IN TRANSIT'}</span>
+                        {load.tag === 'NEW ORDER' && <span className="badge amber">CUSTOMER ORDER</span>}
+                      </div>
+                      <div style={{ fontSize: '13px' }}>
+                        <strong>{load.pickup}</strong> → <strong>{load.delivery}</strong>
+                        {driver && <span style={{ color: 'var(--muted)', marginLeft: '10px' }}>· {driver.name} · {driver.truck}</span>}
+                      </div>
                     </div>
-                    <div style={{ fontSize: '13px' }}>
-                      <strong>{load.pickup}</strong> → <strong>{load.delivery}</strong>
-                      {driver && <span style={{ color: 'var(--muted)', marginLeft: '10px' }}>· {driver.name} · {driver.truck}</span>}
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--green)', fontFamily: 'var(--font-display)', fontWeight: '800', fontSize: '16px' }}>
+                        {load.rate > 0 ? `$${load.rate.toLocaleString()}` : 'Rate TBD'}
+                      </span>
+                      {load.status === 'assigned' && (
+                        <button className="btn" style={{ background: 'var(--green)', color: '#000', fontSize: '12px', padding: '7px 14px' }}
+                          onClick={() => markDelivered(load.id)}>
+                          ✓ Mark Delivered
+                        </button>
+                      )}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <span style={{ color: 'var(--green)', fontFamily: 'var(--font-display)', fontWeight: '800', fontSize: '16px' }}>
-                      {load.rate > 0 ? `$${load.rate.toLocaleString()}` : 'Rate TBD'}
-                    </span>
-                    {load.status === 'assigned' && (
-                      <button className="btn" style={{ background: 'var(--green)', color: '#000', fontSize: '12px', padding: '7px 14px' }}
-                        onClick={() => markDelivered(load.id)}>
-                        ✓ Mark Delivered
-                      </button>
-                    )}
-                  </div>
+                  {load.status === 'assigned' && (
+                    <BackhaulBadge load={load} driver={driver} />
+                  )}
                 </div>
               </div>
             );
@@ -291,7 +344,7 @@ export default function DispatchBoard() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
             <thead>
               <tr style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--border)' }}>
-                {['Driver','Truck','Type','Weight','Route','ETA'].map(h => (
+                {['Driver','Truck','Type','Weight','Capacity','Route','ETA'].map(h => (
                   <th key={h} style={{ padding: '13px 18px', fontSize: '10px', fontWeight: '700', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>{h}</th>
                 ))}
               </tr>
@@ -312,6 +365,28 @@ export default function DispatchBoard() {
                     <td style={{ padding: '14px 18px', color: 'var(--amber)', fontWeight: '700', fontFamily: 'var(--font-display)' }}>{d?.truck || 'N/A'}</td>
                     <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>{load.cargo}</td>
                     <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>{load.weight.toLocaleString()} lbs</td>
+                    <td style={{ padding: '14px 18px' }}>
+                      {(() => {
+                        const truckId = DRIVERS.find(dr => dr.id === load.driverId)?.truck;
+                        const gvwr = TRUCK_GVWR[truckId];
+                        if (!gvwr || !load.weight) return <span style={{ color: 'var(--muted)' }}>—</span>;
+                        const pct = Math.round((load.weight / gvwr) * 100);
+                        const color = pct >= 80 ? 'var(--red)' : pct >= 60 ? 'var(--amber)' : 'var(--green)';
+                        return (
+                          <div>
+                            <div style={{ width: 60, height: 4, borderRadius: 100, background: 'rgba(255,255,255,0.08)', overflow: 'hidden', marginBottom: 4 }}>
+                              <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 100 }} />
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 700, color }}>{pct}%</span>
+                            {pct < 80 && (
+                              <Link to="/marketplace" style={{ textDecoration: 'none', display: 'block', marginTop: 2 }}>
+                                <span style={{ fontSize: 10, color: 'var(--amber)', fontWeight: 600 }}>Backhaul open ↗</span>
+                              </Link>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </td>
                     <td style={{ padding: '14px 18px' }}>
                       <div style={{ fontWeight: '600', fontSize: '13px' }}>{load.pickup}</div>
                       <div style={{ fontSize: '11px', color: 'var(--faint)', marginTop: '2px' }}>→ {load.delivery}</div>
