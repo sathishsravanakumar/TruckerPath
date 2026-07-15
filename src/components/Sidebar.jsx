@@ -8,7 +8,8 @@ const SVG = {
   twin:     <svg className="dbs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1 3l9 5 9-5M1 3v13l9 5 9-5V3"/><path d="M10 8l9-5"/></svg>,
   alerts:   <svg className="dbs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
   billing:  <svg className="dbs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
-  cost:     <svg className="dbs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+  cost:        <svg className="dbs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+  marketplace: <svg className="dbs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>,
 };
 
 const FLEET = [
@@ -18,8 +19,9 @@ const FLEET = [
   { path: '/alerts',     label: 'Live Alerts',      icon: SVG.alerts, badge: true },
 ];
 const FINANCE = [
-  { path: '/billing', label: 'Billing Pipeline',  icon: SVG.billing },
-  { path: '/cost',    label: 'Cost Intelligence', icon: SVG.cost },
+  { path: '/billing',     label: 'Billing Pipeline',   icon: SVG.billing },
+  { path: '/cost',        label: 'Cost Intelligence',  icon: SVG.cost },
+  { path: '/marketplace', label: 'Load Marketplace',   icon: SVG.marketplace },
 ];
 
 export default function Sidebar({ onLogout }) {
