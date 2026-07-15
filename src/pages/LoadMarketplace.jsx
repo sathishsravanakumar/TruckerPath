@@ -49,11 +49,13 @@ const StopIcon = L.divIcon({
 });
 
 const CITY_COORDS = {
-  'Dallas, TX':       [32.7767, -96.7970],
-  'San Antonio, TX':  [29.4241, -98.4936],
-  'El Paso, TX':      [31.7619, -106.4850],
-  'Tucson, AZ':       [32.2226, -110.9747],
   'Phoenix, AZ':      [33.4484, -112.0740],
+  'Tucson, AZ':       [32.2226, -110.9747],
+  'El Paso, TX':      [31.7619, -106.4850],
+  'San Antonio, TX':  [29.4241, -98.4936],
+  'Dallas, TX':       [32.7767, -96.7970],
+  'Mesa, AZ':         [33.4152, -111.8315],
+  'Chandler, AZ':     [33.3062, -111.8413],
 };
 
 // ---------------------------------------------------------------------------
@@ -208,8 +210,11 @@ function OpportunitySummaryCard({ opportunity }) {
   } = opportunity;
 
   const stopCount = stops ? stops.length : 0;
-  const completedStops = next_stop_index || 0;
-  const progressPct = stopCount > 1 ? Math.round((completedStops / (stopCount - 1)) * 100) : 0;
+  // Truck is currently AT the origin (stops[0]). next_stop_index tells us the NEXT destination.
+  // Completed legs = 0 (hasn't departed yet — that's why we're broadcasting the backhaul)
+  const currentStopIndex = 0; // truck is at origin, awaiting backhaul decision before departure
+  const completedStops = 0;
+  const progressPct = 0;
 
   // Truck health data (from TRUCK_DB)
   const truckHealth = {
@@ -249,8 +254,9 @@ function OpportunitySummaryCard({ opportunity }) {
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 10, color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 2 }}>Dispatched</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Today 8:00 PM ETA</div>
+            <div style={{ fontSize: 10, color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 2 }}>Status</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--amber)' }}>Awaiting departure</div>
+            <div style={{ fontSize: 10, color: 'var(--faint)', marginTop: 2 }}>ETA Phoenix: Today 8:00 PM</div>
           </div>
         </div>
 
@@ -264,7 +270,7 @@ function OpportunitySummaryCard({ opportunity }) {
               Live Route
             </span>
             <span style={{ fontSize: 11, color: 'var(--muted)' }}>
-              {completedStops} of {stopCount - 1} legs complete · {progressPct}%
+              At origin · {stopCount - 1} legs remaining
             </span>
           </div>
 
@@ -276,8 +282,8 @@ function OpportunitySummaryCard({ opportunity }) {
             <div style={{ position: 'absolute', top: '50%', left: 20, width: `calc(${progressPct}% - 20px)`, height: 2, background: 'var(--amber)', transform: 'translateY(-50%)', transition: 'width 0.5s ease' }} />
 
             {stops.map((stop, i) => {
-              const isCompleted = i < completedStops;
-              const isCurrent = i === completedStops;
+              const isCompleted = i < currentStopIndex;
+              const isCurrent = i === currentStopIndex;
 
               return (
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 2 }}>
@@ -384,27 +390,67 @@ function BidCard({ bid, ineligible, selected, onSelect }) {
         boxShadow: selected ? '0 0 12px rgba(245,158,11,0.15)' : 'none',
       }}
     >
-      <div style={{
-        fontWeight: 700,
-        fontSize: 13,
-        color: 'var(--text)',
-        textDecoration: ineligible ? 'line-through' : 'none',
-        marginBottom: 4,
-      }}>
-        {bid.carrier_name}
+      {/* Row 1: Carrier name + urgency */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <div style={{
+          fontWeight: 700,
+          fontSize: 13,
+          color: 'var(--text)',
+          textDecoration: ineligible ? 'line-through' : 'none',
+        }}>
+          {bid.carrier_name}
+        </div>
+        {bid.is_urgent && (
+          <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--red)', background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.25)', padding: '1px 6px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Urgent</span>
+        )}
       </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', fontSize: 12, color: 'var(--muted)' }}>
+
+      {/* Row 2: Cargo type, weight, price */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>
         <span>{bid.cargo_type}</span>
         <span style={{ color: 'var(--faint)' }}>·</span>
         <span>{bid.cargo_weight_lbs?.toLocaleString()} lbs</span>
         <span style={{ color: 'var(--faint)' }}>·</span>
         <span style={{ color: 'var(--text)', fontWeight: 600 }}>${bid.bid_price?.toLocaleString()}</span>
       </div>
+
+      {/* Row 3: Pickup → Drop */}
       {bid.pickup_location && (
-        <div style={{ fontSize: 11, color: 'var(--faint)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ fontSize: 11, color: 'var(--faint)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
           <span>{bid.pickup_location}</span>
           <span style={{ color: 'var(--amber)' }}>→</span>
           <span>{bid.drop_location}</span>
+        </div>
+      )}
+
+      {/* Row 4: Quick specs — freight class, pallets, dims, stackable */}
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+        {bid.freight_class && (
+          <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--muted)', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border2)', padding: '1px 6px', borderRadius: 4 }}>
+            FC {bid.freight_class}
+          </span>
+        )}
+        {bid.pallet_count && (
+          <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--muted)', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border2)', padding: '1px 6px', borderRadius: 4 }}>
+            {bid.pallet_count} pallets
+          </span>
+        )}
+        {bid.skid_dims && (
+          <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--muted)', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border2)', padding: '1px 6px', borderRadius: 4 }}>
+            {bid.skid_dims}
+          </span>
+        )}
+        {bid.is_stackable !== undefined && (
+          <span style={{ fontSize: 9, fontWeight: 600, color: bid.is_stackable ? 'var(--green)' : 'var(--red)', background: bid.is_stackable ? 'var(--green-dim)' : 'var(--red-dim)', padding: '1px 6px', borderRadius: 4 }}>
+            {bid.is_stackable ? 'Stackable' : 'No Stack'}
+          </span>
+        )}
+      </div>
+
+      {/* Row 5: Pickup window */}
+      {bid.pickup_window && (
+        <div style={{ fontSize: 10, color: 'var(--faint)', marginTop: 4 }}>
+          ⏱ {bid.pickup_window}
         </div>
       )}
     </div>

@@ -357,31 +357,31 @@ const TRUCK_012 = {
 };
 
 /**
- * OPP-001: Industrial primary cargo, 56,000 lbs, next stop index 1.
+ * OPP-001: Industrial primary cargo, 42,000 lbs, next stop index 1.
  */
 const OPP_001 = {
   id: 'OPP-001',
   primary_cargo_type: 'Industrial',
-  primary_load_weight: 56000,
+  primary_load_weight: 42000,
   next_stop_index: 1,
-  primary_load_volume_cuft: 2660,
+  primary_load_volume_cuft: 2000,
 };
 
 // Seed bids from design doc
 const BID_001 = {
   bid_id: 'BID-001',
   cargo_type: 'Retail',
-  cargo_weight_lbs: 18000,   // 56000+18000=74000 < 80000 ✓
+  cargo_weight_lbs: 18000,   // 42000+18000=60000 < 80000 ✓
   drop_stop_index: 1,        // matches next stop ✓
-  cargo_volume_cuft: 1200,   // 2660+1200=3860 > 3800 ✗ (fails Gate 4)
+  cargo_volume_cuft: 1900,   // 2000+1900=3900 > 3800 ✗ (fails Gate 4)
 };
 
 const BID_002 = {
   bid_id: 'BID-002',
   cargo_type: 'Automotive',
-  cargo_weight_lbs: 15000,   // 56000+15000=71000 < 80000 ✓
+  cargo_weight_lbs: 15000,   // 42000+15000=57000 < 80000 ✓
   drop_stop_index: 1,
-  cargo_volume_cuft: 850,    // 2660+850=3510 ≤ 3800 ✓ (passes Gate 4)
+  cargo_volume_cuft: 850,    // 2000+850=2850 ≤ 3800 ✓ (passes Gate 4)
 };
 
 const BID_003 = {
@@ -395,15 +395,15 @@ const BID_003 = {
 const BID_004 = {
   bid_id: 'BID-004',
   cargo_type: 'General',
-  cargo_weight_lbs: 28000,   // 56000+28000=84000 > 80000 ✗
+  cargo_weight_lbs: 40000,   // 42000+40000=82000 > 80000 ✗
   drop_stop_index: 2,
-  cargo_volume_cuft: 900,    // irrelevant, still fails Gate 2
+  cargo_volume_cuft: 1400,   // irrelevant, still fails Gate 2
 };
 
 const BID_005 = {
   bid_id: 'BID-005',
   cargo_type: 'Agriculture',
-  cargo_weight_lbs: 12000,   // 56000+12000=68000 < 80000 ✓
+  cargo_weight_lbs: 12000,   // 42000+12000=54000 < 80000 ✓
   drop_stop_index: 3,        // 3 > next_stop_index 1 ✗
   cargo_volume_cuft: 600,    // irrelevant, still fails Gate 3
 };
@@ -480,8 +480,8 @@ describe('filterBid — unit tests', () => {
 
   // GVWR boundary: combined weight exactly equal to GVWR → eligible (not exceeded)
   it('treats combined weight exactly equal to GVWR as eligible', () => {
-    const exactBid = { cargo_type: 'Retail', cargo_weight_lbs: 24000, drop_stop_index: 1, cargo_volume_cuft: 100 };
-    // 56000 + 24000 = 80000 === gvwr → not exceeded
+    const exactBid = { cargo_type: 'Retail', cargo_weight_lbs: 38000, drop_stop_index: 1, cargo_volume_cuft: 100 };
+    // 42000 + 38000 = 80000 === gvwr → not exceeded
     const result = filterBid(exactBid, OPP_001, TRUCK_012);
     expect(result).toEqual({ eligibility_status: 'eligible', disqualify_reason: null });
   });
@@ -495,24 +495,24 @@ describe('filterBid — unit tests', () => {
 
   // Gate 4: exact-fit boundary (combined volume === trailer volume → eligible)
   it('passes Gate 4 when combined volume exactly equals trailer volume', () => {
-    const exactVolBid = { cargo_type: 'Retail', cargo_weight_lbs: 5000, drop_stop_index: 1, cargo_volume_cuft: 1140 };
-    // 2660 + 1140 = 3800 === trailer_volume_cuft → not exceeded
+    const exactVolBid = { cargo_type: 'Retail', cargo_weight_lbs: 5000, drop_stop_index: 1, cargo_volume_cuft: 1800 };
+    // 2000 + 1800 = 3800 === trailer_volume_cuft → not exceeded
     const result = filterBid(exactVolBid, OPP_001, TRUCK_012);
     expect(result).toEqual({ eligibility_status: 'eligible', disqualify_reason: null });
   });
 
   // Gate 4: over-limit case
   it('returns volume_exceeded when combined volume exceeds trailer capacity', () => {
-    const bulkyBid = { cargo_type: 'Retail', cargo_weight_lbs: 5000, drop_stop_index: 1, cargo_volume_cuft: 1141 };
-    // 2660 + 1141 = 3801 > 3800 ✗
+    const bulkyBid = { cargo_type: 'Retail', cargo_weight_lbs: 5000, drop_stop_index: 1, cargo_volume_cuft: 1801 };
+    // 2000 + 1801 = 3801 > 3800 ✗
     const result = filterBid(bulkyBid, OPP_001, TRUCK_012);
     expect(result).toEqual({ eligibility_status: 'ineligible', disqualify_reason: 'volume_exceeded' });
   });
 
   // Gate 4: light-but-bulky demo case
-  it('returns volume_exceeded for BID-001 (18,000 lbs is fine on weight, but 1,200 cuft cubes out)', () => {
-    // Weight: 56000+18000=74000 < 80000 ✓ (weight gate passes)
-    // Volume: 2660+1200=3860 > 3800 ✗ (volume gate fails)
+  it('returns volume_exceeded for BID-001 (18,000 lbs is fine on weight, but 1,900 cuft cubes out)', () => {
+    // Weight: 42000+18000=60000 < 80000 ✓ (weight gate passes)
+    // Volume: 2000+1900=3900 > 3800 ✗ (volume gate fails)
     const result = filterBid(BID_001, OPP_001, TRUCK_012);
     expect(result.eligibility_status).toBe('ineligible');
     expect(result.disqualify_reason).toBe('volume_exceeded');

@@ -31,6 +31,7 @@ dist-ssr
 
 # Build log (local reference)
 BACKHAUL_MARKETPLACE.md
+WHAT_WE_BUILT.md
 
 # Python bytecode
 __pycache__/
