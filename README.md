@@ -1,6 +1,6 @@
 # TruckerPath — Fleet Operations & Intelligence Platform
 
-TruckerPath is a full-stack fleet management SaaS platform built for modern logistics teams. It combines a marketing landing page, role-based login flows, a fully featured admin operations dashboard, and a customer shipment portal — all in a premium amber-accented dark UI.
+TruckerPath is a full-stack fleet management SaaS platform built for modern logistics teams. It combines a marketing landing page, role-based login flows, a fully featured admin operations dashboard, a backhaul load marketplace, and a customer shipment portal — all in a premium amber-accented dark UI.
 
 ---
 
@@ -13,8 +13,8 @@ TruckerPath is a full-stack fleet management SaaS platform built for modern logi
 
 ### Authentication
 - **Login Chooser** — role selector screen (Admin / Driver & Shipper)
-- **Admin Login** — fleet manager login with credentials
-- **Driver / Customer Login & Signup** — separate portal entry
+- **Admin Login** — fleet manager login with credentials (`admin@truckerpath.com` / `admin123`)
+- **Driver / Customer Login & Signup** — separate portal entry (`user@company.com` / `user123`)
 
 ### Admin Dashboard — Fleet Command Center
 
@@ -41,6 +41,17 @@ TruckerPath is a full-stack fleet management SaaS platform built for modern logi
 - Severity filter tabs: All / Critical / Warning / Info
 - OSM tactical map overlay via Leaflet showing relay intercept paths
 
+#### Backhaul Load Marketplace
+- Broadcast available backhaul capacity on active truck routes
+- AI-ranked carrier bids evaluated through a 4-gate eligibility pipeline:
+  - **G1** Commodity compatibility matrix (8 cargo types)
+  - **G2** GVWR headroom (primary + backhaul weight ≤ truck GVWR)
+  - **G3** LIFO route sequencing (drop stop must precede next primary stop)
+  - **G4** Volumetric trailer capacity (combined load volume ≤ trailer volume)
+- Net value ranking: `bid_price − detour_cost`, tie-broken by lowest detour
+- Matching runs server-side (FastAPI) with automatic browser fallback if backend is unavailable
+- Award flow updates fleet state and logs the winning bid reason
+
 #### Billing Pipeline
 - Document upload (BOL, POD, Fuel Receipt) with drag-and-drop
 - Simulated AI OCR extraction with live terminal output
@@ -63,7 +74,7 @@ TruckerPath is a full-stack fleet management SaaS platform built for modern logi
 
 | Layer | Technology |
 |---|---|
-| Framework | React 19 + Vite 8 |
+| Frontend framework | React 19 + Vite 8 |
 | Routing | React Router v7 |
 | State | React Context API (`useFleetState`) |
 | 3D | Three.js via `@react-three/fiber` + `@react-three/drei` |
@@ -72,39 +83,58 @@ TruckerPath is a full-stack fleet management SaaS platform built for modern logi
 | Icons | `lucide-react` |
 | Fonts | Syne (display) + DM Sans (body) via Google Fonts |
 | Styling | Custom CSS variables — amber premium dark theme |
+| Backend | FastAPI + uvicorn (Python) |
+| Data validation | Pydantic v2 |
+| Database | SQLite 3 (`backend/marketplace.db`) |
+| Testing | Vitest + `@testing-library/react` + `fast-check` (property-based) |
 
 ---
 
 ## Project Structure
 
 ```
-src/
-├── assets/
-│   └── logo.png                  # TruckerPath logo
-├── components/
-│   ├── TpLogo.jsx                # Shared logo component
-│   ├── Sidebar.jsx               # Admin nav sidebar
-│   ├── NotificationPanel.jsx     # Header notification bell
-│   ├── LoginChooser.jsx          # Role selector overlay
-│   ├── AdminLogin.jsx            # Admin login form
-│   └── UserLogin.jsx             # Driver/customer login & signup
-├── data/
-│   └── mockData.js               # DRIVERS, LOADS, ALERTS mock datasets
-├── hooks/
-│   └── useFleetState.jsx         # Global fleet state via React Context
-├── pages/
-│   ├── Landing.jsx               # Marketing landing page
-│   ├── UserDashboard.jsx         # Customer shipment portal
-│   ├── DispatchBoard.jsx         # Smart Dispatch
-│   ├── Drivers.jsx               # Driver roster
-│   ├── DriverProfile.jsx         # Per-driver detail page
-│   ├── FleetTwin.jsx             # 3D Digital Twin
-│   ├── AlertsFeed.jsx            # Live alerts + map
-│   ├── BillingPipeline.jsx       # Invoice workflow
-│   └── CostIntelligence.jsx      # P&L analytics
-├── App.jsx                       # View state machine + admin panel layout
-├── main.jsx                      # Entry point: BrowserRouter + FleetProvider
-└── index.css                     # Design system & CSS variables
+├── backend/
+│   ├── __init__.py
+│   ├── main.py               # FastAPI app — POST /marketplace/match
+│   ├── models.py             # Pydantic request/response models
+│   ├── matching.py           # Eligibility filter + net value ranking
+│   ├── database.py           # SQLite connection + table creation
+│   ├── seed.py               # Demo opportunity + bids seeder
+│   ├── requirements.txt
+│   └── marketplace.db        # Created on first run (gitignored)
+├── src/
+│   ├── components/
+│   │   ├── TpLogo.jsx
+│   │   ├── Sidebar.jsx
+│   │   ├── NotificationPanel.jsx
+│   │   ├── LoginChooser.jsx
+│   │   ├── AdminLogin.jsx
+│   │   └── UserLogin.jsx
+│   ├── data/
+│   │   └── mockData.js       # DRIVERS, LOADS, ALERTS, BACKHAUL_OPPORTUNITIES, TRUCK_GVWR
+│   ├── hooks/
+│   │   └── useFleetState.jsx # Global fleet state via React Context
+│   ├── pages/
+│   │   ├── Landing.jsx
+│   │   ├── UserDashboard.jsx
+│   │   ├── DispatchBoard.jsx
+│   │   ├── Drivers.jsx
+│   │   ├── DriverProfile.jsx
+│   │   ├── FleetTwin.jsx
+│   │   ├── AlertsFeed.jsx
+│   │   ├── BillingPipeline.jsx
+│   │   ├── CostIntelligence.jsx
+│   │   └── LoadMarketplace.jsx  # Backhaul marketplace — calls FastAPI or JS fallback
+│   ├── test/
+│   │   └── setup.js
+│   ├── utils/
+│   │   ├── marketplace.js       # Browser-side matching algorithm (fallback)
+│   │   └── marketplace.test.js  # Vitest unit + property-based tests
+│   ├── App.jsx                  # View state machine + admin panel layout
+│   ├── main.jsx                 # Entry point: BrowserRouter + FleetProvider
+│   └── index.css                # Design system & CSS variables
+├── orders.csv                   # Sample freight order data
+└── vite.config.js               # Vite + Vitest config
 ```
 
 ---
@@ -125,12 +155,15 @@ src/
 | `/alerts` | Live Alert Feed |
 | `/billing` | Billing Pipeline |
 | `/cost` | Cost Intelligence |
+| `/marketplace` | Backhaul Load Marketplace |
 
-> Navigation between Landing → Login → Dashboard is managed via React `useState` view state machine in `App.jsx`. The admin sub-pages use React Router for client-side routing within the dashboard.
+> Navigation between Landing → Login → Dashboard is managed via a React `useState` view state machine in `App.jsx`. Admin sub-pages use React Router for client-side routing within the dashboard.
 
 ---
 
 ## Getting Started
+
+### Frontend
 
 ```bash
 npm install
@@ -139,19 +172,79 @@ npm run dev
 
 Runs at `http://localhost:5173/Load-Lorry/`
 
-To run on a specific port:
+### Backend
 
 ```bash
-npx vite --port 8001
+cd backend
+pip install -r requirements.txt
+
+# Seed the demo opportunity and bids (run once)
+python -m backend.seed
+
+# Start the API server
+uvicorn backend.main:app --reload --port 8000
 ```
+
+The marketplace page calls `http://localhost:8000/marketplace/match` directly (CORS is enabled for `localhost:5173`). If the backend is not running, the page falls back automatically to the browser-side JavaScript implementation — same algorithm, same results, with a `Demo mode` indicator.
 
 ### Other Commands
 
 ```bash
 npm run build    # Production build → dist/
-npm run preview  # Preview production build locally
+npm run preview  # Preview production build
 npm run lint     # ESLint check
+npm test         # Run Vitest unit + property-based tests
 ```
+
+---
+
+## Backend API
+
+### `POST /marketplace/match`
+
+Accepts a `MatchRequest` payload, runs the 4-gate eligibility filter and net value ranking, and returns a `MatchResponse`.
+
+**Request body (excerpt)**
+
+```json
+{
+  "truck_id": "TRUCK-012",
+  "primary_load_weight": 56000,
+  "truck_gvwr": 80000,
+  "primary_cargo_type": "General",
+  "truck_certified_commodities": ["General", "Reefer"],
+  "next_stop_index": 2,
+  "primary_load_volume_cuft": 2660,
+  "truck_trailer_volume_cuft": 3800,
+  "bids": [...]
+}
+```
+
+**Response**
+
+```json
+{
+  "eligible_bids": [...],
+  "ineligible_bids": [...],
+  "recommended_bid_id": "BID-002"
+}
+```
+
+### `GET /health`
+
+Returns `{ "status": "ok", "service": "backhaul-marketplace" }`.
+
+---
+
+## Database Schema
+
+SQLite database at `backend/marketplace.db` — created automatically on first startup.
+
+| Table | Purpose |
+|---|---|
+| `opportunities` | Backhaul broadcast events — truck, capacity, primary load |
+| `bids` | Carrier bids with eligibility status, net value, and rank |
+| `awards` | Winning bid records with reason and timestamp |
 
 ---
 
