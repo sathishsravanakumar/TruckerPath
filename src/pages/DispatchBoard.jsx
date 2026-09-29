@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Zap, Plus, ArrowRight } from 'lucide-react';
-import { DRIVERS, INITIAL_LOADS, TRUCK_GVWR } from '../data/mockData';
+import { DRIVERS, INITIAL_LOADS, TRUCK_GVWR, COMPANIES } from '../data/mockData';
 import { useFleetState } from '../hooks/useFleetState';
 import LoadCreationDrawer from '../components/LoadCreationDrawer';
 
@@ -84,6 +84,22 @@ function BackhaulBadge({ load, driver }) {
       </Link>
     </div>
   );
+}
+
+function CompanyTag({ load }) {
+  if (!load.company) return null;
+  const company = COMPANIES.find(c => c.Code === load.company || c.Name === load.company);
+  if (company) {
+    return (
+      <Link to={`/companies/${company.Code}`} style={{ textDecoration: 'none' }} onClick={e => e.stopPropagation()}>
+        <span style={{ fontSize: '11px', color: 'var(--muted)' }}>
+          Customer: <span style={{ color: 'var(--amber)', fontWeight: 600 }}>{company.Name} ↗</span>
+        </span>
+      </Link>
+    );
+  }
+  // Customer-typed name from the booking form — no matching account on file yet.
+  return <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Customer: {load.company}</span>;
 }
 
 const STATUS_BORDER = { blocked: 'var(--red)', needs_input: 'var(--amber)', ready: 'var(--green)', assigned: 'var(--green)' };
@@ -199,6 +215,7 @@ export default function DispatchBoard() {
                     <span style={{ fontFamily: 'var(--font-display)', fontWeight: '700', fontSize: '15px' }}>{load.delivery}</span>
                   </div>
                   <p style={{ fontSize: '12px' }}>{load.cargo} · {load.weight.toLocaleString()} lbs · {load.miles} mi · {load.deadline}</p>
+                  <div style={{ marginTop: '6px' }}><CompanyTag load={load} /></div>
                 </div>
 
                 <ReturnBar prob={load.returnProb} />
@@ -308,6 +325,7 @@ export default function DispatchBoard() {
                         <strong>{load.pickup}</strong> → <strong>{load.delivery}</strong>
                         {driver && <span style={{ color: 'var(--muted)', marginLeft: '10px' }}>· {driver.name} · {driver.truck}</span>}
                       </div>
+                      <div style={{ marginTop: '4px' }}><CompanyTag load={load} /></div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <span style={{ color: 'var(--green)', fontFamily: 'var(--font-display)', fontWeight: '800', fontSize: '16px' }}>

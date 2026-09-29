@@ -16,6 +16,8 @@ import CostIntelligence from './pages/CostIntelligence';
 import Drivers from './pages/Drivers';
 import TpLogo from './components/TpLogo';
 import LoadMarketplace from './pages/LoadMarketplace';
+import Companies from './pages/Companies';
+import CompanyProfile from './pages/CompanyProfile';
 
 export default function App() {
   const [view, setView] = useState(() => sessionStorage.getItem('tp-view') ?? 'landing');
@@ -108,6 +110,8 @@ export default function App() {
               <Route path="/alerts" element={<AlertsFeed />} />
               <Route path="/billing" element={<BillingPipeline />} />
               <Route path="/cost" element={<CostIntelligence />} />
+              <Route path="/companies" element={<Companies />} />
+              <Route path="/companies/:code" element={<CompanyProfile />} />
               <Route path="/marketplace" element={<LoadMarketplace />} />
             </Routes>
           </div>

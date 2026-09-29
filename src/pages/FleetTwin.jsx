@@ -1,10 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
-import { EffectComposer, Bloom, N8AO } from '@react-three/postprocessing';
+import { OrbitControls, ContactShadows } from '@react-three/drei';
 import TruckModel from '../components/TruckModel';
 import { TRUCK_DB as TRUCK_DB_INITIAL } from '../data/mockData';
+
+class CanvasErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+  }
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    if (this.state.failed) {
+      return (
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', color: 'var(--amber)' }}>
+          <span style={{ fontSize: '40px' }}>⚠️</span>
+          <p style={{ fontWeight: '700', fontSize: '15px' }}>WebGL context blocked</p>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted, #94a3b8)', textAlign: 'center', maxWidth: '300px', lineHeight: '1.6' }}>
+            Your browser has exhausted its WebGL contexts.<br />
+            Fully quit and reopen your browser, then reload this page.
+          </p>
+          <button className="btn" onClick={() => window.location.reload()} style={{ fontSize: '12px' }}>
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function FleetTwin() {
   const [searchParams] = useSearchParams();
@@ -63,18 +90,19 @@ export default function FleetTwin() {
         className="canvas-wrapper"
         onWheelCapture={(e) => { if (!e.ctrlKey) e.stopPropagation(); }}
       >
-        <Canvas camera={{ position: [8, 4, 10], fov: 45 }}>
-          <Environment preset="city" />
-          <ambientLight intensity={0.4} />
-          <directionalLight position={[10, 10, 5]} intensity={1.5} />
-          <TruckModel truckData={truckData} />
-          <ContactShadows position={[0, -0.6, 0]} opacity={0.6} scale={20} blur={2} />
-          <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2.1} />
-          <EffectComposer>
-            <Bloom luminanceThreshold={0.8} luminanceSmoothing={0.9} intensity={0.6} />
-            <N8AO aoRadius={2} intensity={1.5} />
-          </EffectComposer>
-        </Canvas>
+        <CanvasErrorBoundary>
+          <Canvas camera={{ position: [8, 4, 10], fov: 45 }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
+            <color attach="background" args={['#05080F']} />
+            <ambientLight intensity={1.2} />
+            <directionalLight position={[10, 10, 5]} intensity={3.0} castShadow />
+            <directionalLight position={[-6, 8, -4]} intensity={1.5} color="#a0b8ff" />
+            <pointLight position={[0, 6, 0]} intensity={1.2} color="#f59e0b" />
+            <hemisphereLight skyColor="#3a5a9a" groundColor="#1a1a2a" intensity={1.0} />
+            <TruckModel truckData={truckData} />
+            <ContactShadows position={[0, -0.6, 0]} opacity={0.5} scale={20} blur={2} />
+            <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2.1} />
+          </Canvas>
+        </CanvasErrorBoundary>
         {truckData.tireRL < 75 && (
           <div style={{ position: 'absolute', top: '32px', left: '32px', width: '320px' }} className="glass-card">
             <h4 style={{ color: 'var(--red)', marginBottom: '8px' }}>⚠️ CRITICAL TIRE EVENT</h4>
@@ -132,7 +160,7 @@ export default function FleetTwin() {
             ↓ Export Diagnostics JSON
           </button>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button className="btn" style={{ background: 'var(--red)', color: '#fff', flex: 1 }} onClick={() => setTruckData(prev => ({...prev, tireRL: 67}))}>Simulate Fault</button>
+            <button className="btn" style={{ background: 'var(--red)', color: '#fff', flex: 1 }} onClick={() => setTruckData(prev => ({ ...prev, tireRL: 67 }))}>Simulate Fault</button>
             <button className="btn secondary" style={{ flex: 1 }} onClick={() => {
               setTruckDB(TRUCK_DB_INITIAL);
               setTruckData(TRUCK_DB_INITIAL[activeTruck]);

@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { RoundedBox } from '@react-three/drei';
 
-function StatusMaterial({ info, baseColor = '#004a99' }) {
+function StatusMaterial({ info, baseColor = '#1a4f8a' }) {
   const matRef = useRef();
   useFrame((state) => {
     if (matRef.current && info?.pulse) {
@@ -10,10 +10,10 @@ function StatusMaterial({ info, baseColor = '#004a99' }) {
     }
   });
   return (
-    <meshPhysicalMaterial
+    <meshStandardMaterial
       ref={matRef}
       color={info ? info.color : baseColor}
-      roughness={0.2} metalness={0.6} clearcoat={1.0}
+      roughness={0.3} metalness={0.5}
       emissive={info ? info.emissive : '#000000'}
       emissiveIntensity={info ? info.intensity : 0}
     />
@@ -40,10 +40,10 @@ export default function TruckModel({ truckData }) {
   const tireRLStatus = getStatusInfo(truckData.tireRL, 'tire');
   const engineStatus = getStatusInfo(truckData.engine, 'engine');
 
-  const chromeMat = <meshPhysicalMaterial color="#ffffff" metalness={1.0} roughness={0.05} clearcoat={1.0} envMapIntensity={1.5} />;
-  const rubberMat = <meshStandardMaterial color="#0a0a0a" roughness={0.9} />;
-  const glassMat = <meshPhysicalMaterial color="#020617" roughness={0} metalness={0.9} transparent opacity={0.6} transmission={0.5} />;
-  const frameMat = <meshStandardMaterial color="#1e293b" metalness={0.5} roughness={0.7} />;
+  const chromeMat = <meshStandardMaterial color="#c0c8d8" metalness={0.8} roughness={0.25} />;
+  const rubberMat = <meshStandardMaterial color="#1a1a2e" roughness={0.9} />;
+  const glassMat = <meshStandardMaterial color="#1a3a5c" transparent opacity={0.55} roughness={0.1} metalness={0.3} />;
+  const frameMat = <meshStandardMaterial color="#2d3f5a" metalness={0.4} roughness={0.6} />;
 
   useFrame((state) => {
     if (group.current) group.current.rotation.y = state.clock.getElapsedTime() * 0.15;

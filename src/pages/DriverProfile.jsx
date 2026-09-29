@@ -1,5 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { DRIVERS, INITIAL_LOADS, DRIVER_DOCS } from '../data/mockData';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { DRIVERS, INITIAL_LOADS, DRIVER_DOCS, COMPANIES } from '../data/mockData';
 
 function HealthBar({ value, max = 100, height = 8, width = '100%' }) {
   const pct = (value / max) * 100;
@@ -190,17 +190,26 @@ export default function DriverProfile() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
             <thead>
               <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
-                {['LOAD', 'ROUTE', 'CARGO', 'RATE', 'MILES', 'STATUS'].map(h => (
+                {['LOAD', 'ROUTE', 'CARGO', 'COMPANY', 'RATE', 'MILES', 'STATUS'].map(h => (
                   <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: '10px', fontWeight: '800', color: 'var(--muted)', letterSpacing: '1px', borderBottom: '1px solid var(--border)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {driverLoads.map(load => (
+              {driverLoads.map(load => {
+                const company = COMPANIES.find(c => c.Code === load.company);
+                return (
                 <tr key={load.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                   <td style={{ padding: '12px 14px', fontWeight: '700' }}>#{load.id}</td>
                   <td style={{ padding: '12px 14px', fontFamily: 'monospace', fontSize: '12px' }}>{load.pickup} → {load.delivery}</td>
                   <td style={{ padding: '12px 14px', color: 'var(--muted)' }}>{load.cargo}</td>
+                  <td style={{ padding: '12px 14px' }}>
+                    {company ? (
+                      <Link to={`/companies/${company.Code}`} style={{ color: 'var(--amber)', fontWeight: 600, fontSize: '12px', textDecoration: 'none' }}>{company.Name} ↗</Link>
+                    ) : (
+                      <span style={{ color: 'var(--muted)' }}>—</span>
+                    )}
+                  </td>
                   <td style={{ padding: '12px 14px', fontWeight: '600' }}>${load.rate.toLocaleString()}</td>
                   <td style={{ padding: '12px 14px', color: 'var(--muted)' }}>{load.miles} mi</td>
                   <td style={{ padding: '12px 14px' }}>
@@ -209,7 +218,8 @@ export default function DriverProfile() {
                     </span>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         )}

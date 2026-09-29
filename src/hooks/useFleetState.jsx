@@ -141,6 +141,7 @@ export function FleetProvider({ children }) {
         returnProb: 50,
         candidates: [1, 3, 4],
         customerShipmentId: shipId,
+        company: formData.company || undefined,
       }, ...prev];
     });
 
@@ -160,6 +161,7 @@ export function FleetProvider({ children }) {
       trailer: formData.trailer || 'Dry Van',
       bol: `BOL-${80000 + Math.floor(Math.random() * 9999)}`,
       truck: 'TBD',
+      company: formData.company || undefined,
       pickupDate: formData.pickupDate || now,
       deliveryDate: 'TBD',
       distance: 'TBD',

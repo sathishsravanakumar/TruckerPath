@@ -41,7 +41,7 @@ TruckerPath is a full-stack fleet management SaaS platform built for modern logi
 - Interactive Three.js truck model built from geometric primitives (no external 3D assets)
 - Per-component fault highlighting — tires, brakes, engine — red pulse on fault, amber on warning
 - Live telemetry panel: tire PSI (FL/FR/RL/RR), brake pad life, fuel level, engine status, HOS remaining
-- Bloom and ambient occlusion post-processing (N8AO via `@react-three/postprocessing`)
+- Multi-light scene setup (ambient, directional, point, hemisphere) for fault-color accuracy
 - Slow continuous rotation; export diagnostics as JSON
 
 #### Live Alert Feed

@@ -7,9 +7,9 @@ export const DRIVERS = [
 
 export const INITIAL_LOADS = [
   { id:306, pickup:"Mesa, AZ", delivery:"Los Angeles, CA", deadline:"Tomorrow 10:00 AM", priority:"high", rate:3200, miles:372, cargo:"Auto Parts", weight:35000, status:"needs_input", candidates:[1,3], returnProb:82, tag:"NEEDS INPUT" },
-  { id:307, pickup:"Chandler, AZ", delivery:"Houston, TX", deadline:"Tomorrow 4:00 PM", priority:"high", rate:3650, miles:1178, cargo:"Chemical Supplies", weight:44000, status:"blocked", driverId:2, returnProb:68, blockReason:"TRUCK-007 critical tire pressure 67 PSI — blowout risk on highway", tag:"BLOCKED" },
+  { id:307, pickup:"Chandler, AZ", delivery:"Houston, TX", deadline:"Tomorrow 4:00 PM", priority:"high", rate:3650, miles:1178, cargo:"Chemical Supplies", weight:44000, status:"blocked", driverId:2, returnProb:68, blockReason:"TRUCK-007 critical tire pressure 67 PSI — blowout risk on highway", tag:"BLOCKED", company:"ABC" },
   { id:308, pickup:"Phoenix, AZ", delivery:"Denver, CO", deadline:"Tomorrow 12:00 PM", priority:"medium", rate:2980, miles:601, cargo:"Electronics", weight:39000, status:"ready", driverId:4, returnProb:52, hosWarning:true, tag:"READY" },
-  { id:303, pickup:"Phoenix, AZ", delivery:"Dallas, TX", deadline:"Today 8:00 PM", priority:"high", rate:2840, miles:1067, cargo:"Industrial Eq.", weight:42000, status:"assigned", driverId:1, returnProb:71 },
+  { id:303, pickup:"Phoenix, AZ", delivery:"Dallas, TX", deadline:"Today 8:00 PM", priority:"high", rate:2840, miles:1067, cargo:"Industrial Eq.", weight:42000, status:"assigned", driverId:1, returnProb:71, company:"ABC" },
   { id:302, pickup:"Tucson, AZ", delivery:"El Paso, TX", deadline:"Today 11:30 PM", priority:"medium", rate:1920, miles:544, cargo:"Retail Goods", weight:38000, status:"assigned", driverId:3, returnProb:45 },
 ];
 
@@ -655,6 +655,65 @@ export const BACKHAUL_OPPORTUNITIES = [
         net_value: null,
         rank: null,
       },
+    ],
+  },
+];
+
+// Company/account address-book records. Field names/casing are kept as-is —
+// this is a small seed set standing in for a future live account feed, so the
+// shape (including hyphenated keys) is meant to stay stable if that's ever wired up.
+// `orders` is the one field added on top of the base account record, since order
+// history isn't part of an address book — it's mocked here per account.
+export const COMPANIES = [
+  {
+    Company: 'PDG', Code: 'ABC', Name: 'ABC CO. LTD.', Type: 'RET',
+    Address: '1028 QUEEN ST WEST', City: 'TORONTO', Province: 'ON', Postal: 'M6J 1H6', Country: 'CANADA',
+    Phone: '(416) 554-8744', Fax: '(416) 944-9849', Contact: 'Mr Andrews', Email: '',
+    Salesrep: 'TFB', Termcode: 'N30', Balance: 212254.38, Crlimit: 456000, Debtor: true,
+    onHold: false, holdReason: '', 'Rec-Status': true,
+    Strdat: '1998-09-02', LastShipDate: '2026-05-19', LastContDate: '2000-07-29',
+    acctClass: 'MFG', annSales: 250000000, numEmployees: 150, whouseSize: 300000,
+    'Rec-Type': 'LTL', Hazmat: false, Pod: true, 'Appt-Rqd': true,
+    poslat: 43.644093, poslon: -79.420039, webSite: 'www.camerabar.ca',
+    orders: [
+      { id: '#307', loadId: 307, route: 'Chandler, AZ → Houston, TX', commodity: 'Chemical Supplies', weight: '44,000 lbs', rate: 3650, pickupDate: '2026-09-03', deliveryDate: '2026-09-05', status: 'Blocked', invoiceStatus: 'Pending', invoiceAmount: 3650 },
+      { id: '#303', loadId: 303, route: 'Phoenix, AZ → Dallas, TX', commodity: 'Industrial Eq.', weight: '42,000 lbs', rate: 2840, pickupDate: '2026-09-02', deliveryDate: '2026-09-02', status: 'In Transit', invoiceStatus: 'Paid', invoiceAmount: 3650 },
+      { id: 'ORD-8801', route: 'Toronto, ON → Chicago, IL', commodity: 'Automotive Parts', weight: '18,400 lbs', rate: 2850, pickupDate: '2026-07-02', deliveryDate: '2026-07-04', status: 'Delivered', invoiceStatus: 'Paid', invoiceAmount: 2850 },
+      { id: 'ORD-8814', route: 'Toronto, ON → Detroit, MI', commodity: 'Automotive Parts', weight: '22,000 lbs', rate: 1980, pickupDate: '2026-07-15', deliveryDate: '2026-07-16', status: 'Delivered', invoiceStatus: 'Paid', invoiceAmount: 1980 },
+      { id: 'ORD-8830', route: 'Toronto, ON → Cleveland, OH', commodity: 'General', weight: '15,200 lbs', rate: 2210, pickupDate: '2026-07-28', deliveryDate: '2026-07-30', status: 'Delivered', invoiceStatus: 'Outstanding', invoiceAmount: 2210 },
+      { id: 'ORD-8852', route: 'Toronto, ON → Buffalo, NY', commodity: 'Automotive Parts', weight: '9,800 lbs', rate: 980, pickupDate: '2026-08-05', deliveryDate: '2026-08-06', status: 'Delivered', invoiceStatus: 'Overdue', invoiceAmount: 980 },
+      { id: 'ORD-8879', route: 'Toronto, ON → Pittsburgh, PA', commodity: 'Retail Goods', weight: '26,500 lbs', rate: 3140, pickupDate: '2026-08-20', deliveryDate: '2026-08-22', status: 'In Transit', invoiceStatus: 'Pending', invoiceAmount: 3140 },
+      { id: 'ORD-8901', route: 'Toronto, ON → Columbus, OH', commodity: 'Automotive Parts', weight: '19,000 lbs', rate: 2460, pickupDate: '2026-05-17', deliveryDate: '2026-05-19', status: 'Delivered', invoiceStatus: 'Paid', invoiceAmount: 2460 },
+    ],
+  },
+  {
+    Company: 'PDG', Code: '111', Name: 'ABC Trucking', Type: 'TRA',
+    Address: '123 Mainstreet', City: 'Toronto', Province: 'ON', Postal: 'L5M3J7', Country: '',
+    Phone: '123', Fax: 'fax', Contact: 'admin contact', Email: 'em',
+    Salesrep: 'JWA', Termcode: '30H', Balance: 1300.58, Crlimit: 2000, Debtor: true,
+    onHold: true, holdReason: 'hold reason', 'Rec-Status': true,
+    Strdat: '2016-10-31', LastShipDate: '2026-06-09', LastContDate: '2016-10-31',
+    acctClass: 'class', annSales: 0, numEmployees: 0, whouseSize: 1,
+    'Rec-Type': 'LTL', Hazmat: true, Pod: true, 'Appt-Rqd': true,
+    poslat: 43.68285, poslon: -79.29947, webSite: '',
+    orders: [
+      { id: 'ORD-4401', route: 'Toronto, ON → Hamilton, ON', commodity: 'General Freight', weight: '6,200 lbs', rate: 420, pickupDate: '2026-06-05', deliveryDate: '2026-06-05', status: 'Delivered', invoiceStatus: 'Paid', invoiceAmount: 420 },
+      { id: 'ORD-4415', route: 'Toronto, ON → Kitchener, ON', commodity: 'General Freight', weight: '5,100 lbs', rate: 800.58, pickupDate: '2026-06-09', deliveryDate: '2026-06-09', status: 'Delivered', invoiceStatus: 'Outstanding', invoiceAmount: 800.58 },
+      { id: 'ORD-4430', route: 'Toronto, ON → London, ON', commodity: 'General Freight', weight: '4,800 lbs', rate: 500, pickupDate: '2026-06-09', deliveryDate: '2026-06-09', status: 'Delivered', invoiceStatus: 'Overdue', invoiceAmount: 500 },
+    ],
+  },
+  {
+    Company: 'PDG', Code: 'ABCKY', Name: 'ABC Automotive', Type: 'AM',
+    Address: '145 Corporate Drive', City: 'London', Province: 'KY', Postal: '40741', Country: 'USA',
+    Phone: '', Fax: '', Contact: '', Email: '',
+    Salesrep: '', Termcode: '', Balance: 0, Crlimit: 0, Debtor: false,
+    onHold: false, holdReason: '', 'Rec-Status': true,
+    Strdat: '2019-07-22', LastShipDate: '2025-12-01', LastContDate: '2019-07-22',
+    acctClass: '', annSales: 0, numEmployees: 0, whouseSize: 0,
+    'Rec-Type': 'LTL', Hazmat: false, Pod: false, 'Appt-Rqd': false,
+    poslat: 37.139312, poslon: -84.182778, webSite: '',
+    orders: [
+      { id: 'ORD-2201', route: 'London, KY → Lexington, KY', commodity: 'Automotive', weight: '3,200 lbs', rate: 310, pickupDate: '2025-11-28', deliveryDate: '2025-12-01', status: 'Delivered', invoiceStatus: 'Paid', invoiceAmount: 310 },
     ],
   },
 ];
